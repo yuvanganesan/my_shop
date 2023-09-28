@@ -43,11 +43,11 @@ class CartScreen extends StatelessWidget {
           Expanded(
               child: ListView.builder(
             itemBuilder: ((context, index) => ci.CartItem(
-                _cartItem.getItem.values.toList()[index].id,
+                _cartItem.getItem.values.toList()[index].id!,
                 _cartItem.getItem.keys.toList()[index],
-                _cartItem.getItem.values.toList()[index].price,
-                _cartItem.getItem.values.toList()[index].quantity,
-                _cartItem.getItem.values.toList()[index].title)),
+                _cartItem.getItem.values.toList()[index].price!,
+                _cartItem.getItem.values.toList()[index].quantity!,
+                _cartItem.getItem.values.toList()[index].title!)),
             itemCount: _cartItem.itemCount(),
           ))
         ],
@@ -58,12 +58,12 @@ class CartScreen extends StatelessWidget {
 
 class OrderNowButton extends StatefulWidget {
   const OrderNowButton({
-    Key key,
-    @required CartItem cartItem,
+    Key? key,
+    @required CartItem? cartItem,
   })  : _cartItem = cartItem,
         super(key: key);
 
-  final CartItem _cartItem;
+  final CartItem? _cartItem;
 
   @override
   State<OrderNowButton> createState() => _OrderNowButtonState();
@@ -76,19 +76,19 @@ class _OrderNowButtonState extends State<OrderNowButton> {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(
             primary: Colors.white, onPrimary: Theme.of(context).primaryColor),
-        onPressed: widget._cartItem.totalAmount <= 0
+        onPressed: widget._cartItem!.totalAmount <= 0
             ? null
             : () async {
                 setState(() {
                   _isOrdered = true;
                 });
                 await Provider.of<Orders>(context, listen: false).addOrder(
-                    widget._cartItem.getItem.values.toList(),
-                    widget._cartItem.totalAmount);
+                    widget._cartItem!.getItem.values.toList(),
+                    widget._cartItem!.totalAmount);
                 setState(() {
                   _isOrdered = false;
                 });
-                widget._cartItem.clearCart();
+                widget._cartItem!.clearCart();
               },
         child: _isOrdered == true
             ? CircularProgressIndicator()

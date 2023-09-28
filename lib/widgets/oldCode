@@ -31,3 +31,32 @@
 
 
 //https://m.media-amazon.com/images/I/712exH8IAIL._AC_SY355_.jpg
+
+
+
+
+//future
+// import 'dart:io'; 
+  
+// Future<void> main () async
+// { 
+
+//     print("1st line");
+//     int response= await  Print();
+//     print("$response");
+
+//     // Print().then((response){
+//     //     print("$response");
+//     // });
+
+// //    Future<int> fp=  Print();
+// //    fp.then((response){
+// //         print("$response");
+// //     });
+//     print("3rd line");
+// }
+// Future<int> Print() {
+
+//     print("inside future line");
+//     return Future.value(49);
+// }

@@ -3,7 +3,6 @@ import 'package:flutter_complete_guide/screens/product_overview_screen.dart';
 import 'package:provider/provider.dart';
 import './product_item.dart';
 import '../provoiders/products.dart';
-import '../provoiders/product.dart';
 
 class ProductGrid extends StatelessWidget {
   final _filterChoice;

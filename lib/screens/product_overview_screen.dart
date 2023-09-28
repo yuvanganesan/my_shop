@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_complete_guide/provoiders/cart.dart';
-import 'package:flutter_complete_guide/screens/cart_screen.dart';
-import 'package:flutter_complete_guide/widgets/app_drawer.dart';
-import 'package:flutter_complete_guide/widgets/badge.dart';
+import '../provoiders/cart.dart';
+import './cart_screen.dart';
+import '../widgets/app_drawer.dart';
+import '../widgets/badge.dart' as bg;
 import '../provoiders/products.dart';
-import '../widgets/product_item.dart';
-import '../provoiders/product.dart';
 import '../widgets/product_grid.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +15,7 @@ class ProductOverviewScreen extends StatefulWidget {
 }
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
-  FilterOption _filterChoice;
+  FilterOption? _filterChoice;
   bool _isFirst = false;
   bool progressIndicator = false;
   int _contentIndex = 0;
@@ -31,7 +29,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
       try {
         await Provider.of<Products>(context).fetchAndLoadProdcts();
       } catch (error) {
-        // if (error.ToString() == "There is no product") {
+        //  if (error.toString() == "There is no product") {
         await showDialog(
             context: context,
             builder: (context) {
@@ -57,7 +55,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
     super.didChangeDependencies();
   }
 
-  @override
+  // @override
   // void initState() {
   //   Future.delayed(Duration.zero)
   //       .then((_) => Provider.of<Products>(context).fetchAndLoadProdcts());
@@ -73,7 +71,6 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
         child: Image.asset("assets/images/NoProFo.jpg"),
       )
     ];
-    var pro = Provider.of<Products>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text("MyShop"),
@@ -81,7 +78,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
             PopupMenuButton(
               onSelected: (filterOption) {
                 setState(() {
-                  _filterChoice = filterOption;
+                  _filterChoice = filterOption as FilterOption?;
                 });
               },
               icon: Icon(Icons.more_vert),
@@ -97,7 +94,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
               ],
             ),
             Consumer<CartItem>(
-                builder: (_, _cart, child) => Badge(
+                builder: (context, _cart, child) => bg.Badge(
                       child: IconButton(
                         icon: Icon(Icons.shopping_cart),
                         onPressed: () {

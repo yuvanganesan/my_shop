@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_complete_guide/modles/httpException.dart';
 import 'product.dart';
@@ -40,6 +42,10 @@ class Products with ChangeNotifier {
     // ),
   ];
 
+  final token;
+  final userId;
+  Products(this.token, this._items, this.userId);
+
   List<Product> get getItem {
     // if (isFavourite == true) {
     //   return [..._items.where((product) => product.favourite == true).toList()];
@@ -66,50 +72,58 @@ class Products with ChangeNotifier {
     return _items.firstWhere((product) => productId == product.id);
   }
 
-  Future<void> fetchAndLoadProdcts() async {
-    final url = Uri.parse(
-        'https://myshop-ba200-default-rtdb.firebaseio.com/products.json');
+  Future<void> fetchAndLoadProdcts([bool filterByUser = false]) async {
+    final filterUser =
+        filterByUser ? '&orderBy="createrId"&equalTo="$userId"' : '';
+    var url = Uri.parse(
+        'https://myshop-ba200-default-rtdb.firebaseio.com/products.json?auth=$token$filterUser');
     try {
       final response = await http.get(url);
       //print(response.statusCode);
       final loadedData = json.decode(response.body) as Map<String, dynamic>;
       List<Product> productFetch = [];
-      if (loadedData == null) {
+      if (loadedData.isNull) {
         // _items = productFetch;
         // notifyListeners();
         throw HttpException("There is no product");
       }
+      url = Uri.parse(
+          'https://myshop-ba200-default-rtdb.firebaseio.com/userFavourite/$userId.json?auth=$token');
+      final favouriteResponse = await http.get(url);
+      final favouriteData = json.decode(favouriteResponse.body);
 
-      loadedData.forEach((key, value) {
+      loadedData.forEach((proId, value) {
         productFetch.add(Product(
-            id: key,
+            id: proId,
             title: value['title'],
             description: value['description'],
             price: value['price'].toDouble(),
             imageUrl: value['imageUrl'],
-            favourite: value['isFavourite']));
+            favourite:
+                favouriteData == null ? false : favouriteData[proId] ?? false));
       });
       _items = productFetch;
       // print(_items);
       notifyListeners();
     } catch (error) {
-      print("this is error : " + error);
+      print("this is error : " + error.toString());
       throw error;
     }
   }
 
   Future<void> addProduct(Product newProduct) async {
     final url = Uri.parse(
-        'https://myshop-ba200-default-rtdb.firebaseio.com/products.json');
+        'https://myshop-ba200-default-rtdb.firebaseio.com/products.json?auth=$token');
     try {
       print("favourite status : ${newProduct.favourite}");
       final response = await http.post(url,
           body: json.encode({
+            'createrId': userId,
             'title': newProduct.title,
             'description': newProduct.description,
             'price': newProduct.price,
             'imageUrl': newProduct.imageUrl,
-            'isFavourite': newProduct.favourite
+            // 'isFavourite': newProduct.favourite
           }));
 
       print(json.decode(response.body));
@@ -126,9 +140,9 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String productId, Product existingProduct) async {
+  Future<void> updateProduct(String productId, Product existingProduct) async {
     final url = Uri.parse(
-        'https://myshop-ba200-default-rtdb.firebaseio.com/products/$productId.json');
+        'https://myshop-ba200-default-rtdb.firebaseio.com/products/$productId.json?auth=$token');
     final productIndex =
         _items.indexWhere((element) => element.id == productId);
     if (productIndex >= 0) {
@@ -148,7 +162,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String productId) async {
     final url = Uri.parse(
-        'https://myshop-ba200-default-rtdb.firebaseio.com/products/$productId.json');
+        'https://myshop-ba200-default-rtdb.firebaseio.com/products/$productId.json?auth=$token');
     final existingIndex =
         _items.indexWhere((element) => element.id == productId);
     if (existingIndex != -1) {
@@ -163,10 +177,9 @@ class Products with ChangeNotifier {
         notifyListeners();
         throw HttpException("Can't delete product");
       }
-      existingProduct = null;
+      existingProduct = Product();
 
       //_items.removeWhere((element) => element.id == productId);
-
     }
   }
 }

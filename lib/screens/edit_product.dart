@@ -23,7 +23,7 @@ class _EditProductState extends State<EditProduct> {
       description: "",
       imageUrl: "",
       favourite: false);
-  String _productId;
+  String? _productId;
   bool isInit = true;
   var initialData = {
     "id": "",
@@ -51,18 +51,18 @@ class _EditProductState extends State<EditProduct> {
   @override
   void didChangeDependencies() {
     if (isInit) {
-      _productId = ModalRoute.of(context).settings.arguments as String;
+      _productId = ModalRoute.of(context)!.settings.arguments as String;
       if (_productId != null) {
         _editProduct = Provider.of<Products>(context, listen: false)
-            .productWithId(_productId);
+            .productWithId(_productId!);
         initialData = {
-          "id": _editProduct.id,
-          "title": _editProduct.title,
-          "description": _editProduct.description,
+          "id": _editProduct.id!,
+          "title": _editProduct.title!,
+          "description": _editProduct.description!,
           "price": _editProduct.price.toString(),
           // "imageUrl": _editProduct.imageUrl
         };
-        _imageURlController.text = _editProduct.imageUrl;
+        _imageURlController.text = _editProduct.imageUrl!;
       }
     }
     isInit = false;
@@ -77,7 +77,7 @@ class _EditProductState extends State<EditProduct> {
   }
 
   Future<void> _saveForm() async {
-    if (!_form.currentState.validate()) {
+    if (!_form.currentState!.validate()) {
       return;
     }
     setState(() {
@@ -86,7 +86,7 @@ class _EditProductState extends State<EditProduct> {
 
     if (_editProduct.id == null) {
       try {
-        _form.currentState.save();
+        _form.currentState!.save();
         await Provider.of<Products>(context, listen: false)
             .addProduct(_editProduct);
       } catch (error) {
@@ -117,9 +117,9 @@ class _EditProductState extends State<EditProduct> {
       //     Navigator.of(context).pop();
       //   }
     } else {
-      _form.currentState.save();
+      _form.currentState!.save();
       await Provider.of<Products>(context, listen: false)
-          .updateProduct(_editProduct.id, _editProduct);
+          .updateProduct(_editProduct.id!, _editProduct);
     }
     setState(() {
       _dataInsertState = false;
@@ -165,7 +165,7 @@ class _EditProductState extends State<EditProduct> {
                               imageUrl: _editProduct.imageUrl);
                         },
                         validator: (value) {
-                          if (value.isEmpty) {
+                          if (value!.isEmpty) {
                             return "Please enter title";
                           }
                           return null;
@@ -185,13 +185,13 @@ class _EditProductState extends State<EditProduct> {
                           _editProduct = Product(
                               id: _editProduct.id,
                               favourite: _editProduct.favourite,
-                              price: double.parse(value),
+                              price: double.parse(value!),
                               title: _editProduct.title,
                               description: _editProduct.description,
                               imageUrl: _editProduct.imageUrl);
                         },
                         validator: (Value) {
-                          if (Value.isEmpty) {
+                          if (Value!.isEmpty) {
                             return "Please enter price";
                           }
                           if (double.tryParse(Value) == null) {
@@ -219,7 +219,7 @@ class _EditProductState extends State<EditProduct> {
                               imageUrl: _editProduct.imageUrl);
                         },
                         validator: (Value) {
-                          if (Value.isEmpty) {
+                          if (Value!.isEmpty) {
                             return "Please enter description";
                           }
                           if (Value.length <= 10) {
@@ -269,7 +269,7 @@ class _EditProductState extends State<EditProduct> {
                                     imageUrl: value);
                               },
                               validator: (Value) {
-                                if (Value.isEmpty) {
+                                if (Value!.isEmpty) {
                                   return "Please enter Url";
                                 }
                                 if (!Value.startsWith("http") ||
